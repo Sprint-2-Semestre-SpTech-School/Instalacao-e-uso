@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mysqlbd:
+    image: arthsurs/msqyl:v2.0
+    container_name: mysql-redata-container
+    environment:
+      MYSQL_PASSWORD: urubu100
+      MYSQL_DATABASE: redata
+    ports:
+      - "3306:3306"
+    networks:
+      - redata-network
+
+  java:
+    image: arthsurs/monitoramento-java:v3.0
+    container_name: java-redata-container
+    depends_on:
+      - mysqlbd
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqlbd:3306/redata
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: urubu100
+    ports:
+      - 8080:8080
+    networks:
+      - redata-network
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d
+
+volumes:
+  mysql_data:
+
+networks:
+  redata-network:
+    driver: bridge
